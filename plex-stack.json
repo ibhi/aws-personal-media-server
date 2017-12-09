@@ -14,7 +14,7 @@
 
         "PlexInstanceImageId": {
             "Type": "String",
-            "Default": "ami-d7b9a2b1",
+            "Default": "ami-d5c18eba",
             "Description": "The base image that the instance will created from"
         },
 
@@ -28,16 +28,16 @@
             "Description": "Use one of the public subnets allocated to your account (make sure it's in the same availability zone)."
         },
 
-        "PlexSecurityGroup": {
+        "PlexSecurityGroupId": {
             "Type": "String",
-            "Description": "Use one of the default security group or one created by you (make sure port 32400 is open for ingress)"
+            "Description": "Use one of the default security group Id or one created by you (make sure port 32400 is open for ingress)"
         },
 
         "AvailabilityZone": {
             "Type": "String",
             "Description": "Where you want the instance and volume to be",
-            "AllowedValues": ["eu-west-1a", "eu-west-1b", "eu-west-1c", "ap-south-1"],
-            "Default": "ap-south-1"
+            "AllowedValues": ["eu-west-1a", "eu-west-1b", "eu-west-1c", "ap-south-1a"],
+            "Default": "ap-south-1a"
         }
 
     },
@@ -51,7 +51,7 @@
 
         "PlexServerInstance": {
             "Type": "AWS::EC2::Instance",
-            "DependsOn": ["PlexServerFirewallRules", "PlexServerStorageVolume"],
+            "DependsOn": ["PlexServerStorageVolume"],
             "Properties": {
                 "ImageId": {
                     "Ref": "PlexInstanceImageId"
@@ -59,7 +59,7 @@
                 "InstanceType": {
                     "Ref": "PlexInstanceType"
                 },
-                "KeyName": "LsioPlexServer",
+                "KeyName": "personal-media-server",
                 "AvailabilityZone": {
                     "Ref": "AvailabilityZone"
                 },
@@ -69,9 +69,7 @@
                     "SubnetId": {
                         "Ref": "AccountSubnet"
                     },
-                    "GroupSet": [{
-                        "Ref": "PlexSecurityGroup"
-                    }]
+                    "GroupSet": [{"Ref": "PlexSecurityGroupId"}]
                 }],
                 "Volumes": [{
                     "Device": "/dev/sdk",
