@@ -14,7 +14,7 @@
 
         "PlexInstanceImageId": {
             "Type": "String",
-            "Default": "ami-d5c18eba",
+            "Default": "ami-f3e5aa9c",
             "Description": "The base image that the instance will created from"
         },
 
@@ -87,23 +87,22 @@
                                 "then",
                                 "    mkfs -t ext4 /dev/sdk",
                                 "fi",
-                                "mkdir -p /data/plex",
-                                "mkdir -p /data/media",
-                                "chmod 750 /data/plex",
-                                "chmod 750 /data/media",
-                                "mount /dev/sdk /data/media",
-                                "mkdir -p /data/media/movies",
-                                "mkdir -p /data/media/tv",
-                                "chmod -R 750 /data/media",
-                                "chown -R ec2-user:ec2-user /data/media",
-                                "chown -R ec2-user:ec2-user /data/plex",
-                                "echo \"/dev/sdk /data/media ext4 defaults,nofail 0 2\" >> /etc/fstab",
-                                "yum update -y",
-                                "yum install -y docker",
-                                "service docker start",
-                                "sudo usermod -a -G docker ec2-user",
-                                "docker create --name=plex --net=host -e VERSION=latest -e PUID=$(id -u ec2-user) -e PGID=$(id -g ec2-user) -v /data/plex:/config -v /data/media/tv:/data/tvshows -v /data/media/movies:/data/movies --restart=always linuxserver/plex",
-                                "docker start plex"
+                                "mkdir -p /data",
+                                "chmod 750 /data",
+                                "mount /dev/sdk /data",
+                                "chmod -R 750 /data",
+                                "chown -R ubuntu:ubuntu /data/",
+                                "echo \"/dev/sdk /data ext4 defaults,nofail 0 2\" >> /etc/fstab",
+                                "apt-get update -qq",
+                                "apt-get install apt-transport-https ca-certificates curl software-properties-common",
+                                "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -",
+                                "add-apt-repository \"deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable\"",
+                                "apt-get update -qq",
+                                "apt-get install docker-ce -y",
+                                "mkdir -p /etc/systemd/system/docker.service.d",
+                                "printf \"[Service]\nExecStart=\nExecStart=/usr/bin/dockerd -H fd:// -H tcp://0.0.0.0:2375\n\" >>  /etc/systemd/system/docker.service.d/docker.conf",
+                                "systemctl daemon-reload",
+                                "systemctl restart docker"
                             ]
                         ]
                     }
